@@ -40,6 +40,7 @@ object uuw extends App{
 
   val idWithOriginalTittle = id.zip(originalTittle)
   println()
-  println(idWithOriginalTittle)
-  
+  println(idWithOriginalTittle) 
 }
+
+// libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.10"
