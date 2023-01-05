@@ -1,5 +1,7 @@
 import play.api.libs.json._
 import scala.util.{Try, Success, Failure}
+import com.github.tototoshi.csv._
+import java.io.File
 
 object Main extends App {
   val json: JsValue = Json.parse("""
@@ -80,6 +82,29 @@ object Main extends App {
     (miembros \ i \ "powers" \ 1).get,
     (miembros \ i \ "powers" \ 2).get
   ))
+
+  println("-------------------")
+  val reader = CSVReader.open(new File("C://Users//Kevin//Documents/movie_dataset.csv"))
+  val data = reader.allWithHeaders()
+  reader.close()
+
+  val production_companies = data.flatMap(elem => (elem.get("production_companies"))).map(Json.parse)
+  val nombreCompania = production_companies.flatMap(_ \\ "name" ).map(_.as[String])
+  val produccionC = nombreCompania.groupBy(x => x).map(x => (x._1, x._2.length)).toList
+
+  val production_countries = data.flatMap(elem => (elem.get("production_countries"))).map(Json.parse)
+  val nombrePais = production_countries.flatMap(_ \\ "name").map(_.as[String])
+  val produccionP = nombrePais.groupBy(x => x).map(x => (x._1, x._2.length)).toList
+
+  val spoken_languajes = data.flatMap(elem => (elem.get("spoken_languages"))).map(Json.parse)
+  val nombreIdioma = spoken_languajes.flatMap(_ \\ "name").map(_.as[String])
+  val idiomaN = nombreIdioma.groupBy(x => x).map(x => (x._1, x._2.length)).toList
+
+  printf("Estudios: \n %s \n ------", produccionC)
+  printf("Paises: \n %s \n ------", produccionP)
+  printf("Idioma: \n %s \n ------", idiomaN)
+
 }
 
 dependencia: libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.3"
+libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.10"
