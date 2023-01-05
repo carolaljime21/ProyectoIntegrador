@@ -100,11 +100,25 @@ object Main extends App {
   val nombreIdioma = spoken_languajes.flatMap(_ \\ "name").map(_.as[String])
   val idiomaN = nombreIdioma.groupBy(x => x).map(x => (x._1, x._2.length)).toList
 
-  printf("Estudios: \n %s \n ------", produccionC)
-  printf("Paises: \n %s \n ------", produccionP)
-  printf("Idioma: \n %s \n ------", idiomaN)
+  printf("Estudios: \n %s \n\n ------", produccionC)
+  printf("Estudio mas popular: \n %s \n\n ------", produccionC.maxBy(_._2)._1)
+  printf("Estudio menos popular: \n %s \n\n ------", produccionC.minBy(_._2)._1)
+
+  printf("Paises: \n %s \n\n ------", produccionP)
+  printf("Pais mas popular: \n %s \n\n ------", produccionP.maxBy(_._2)._1)
+  printf("Pais menos popular: \n %s \n\n ------", produccionP.minBy(_._2)._1)
+
+  printf("Idioma: \n %s \n\n ------", idiomaN)
+  printf("Idioma mas popular: \n %s \n\n ------", idiomaN.maxBy(_._2)._1)
+  printf("Idioma menos popular: \n %s \n\n ------", idiomaN.minBy(_._2)._1)
+
+
+  val orginalT = data.flatMap(elem => (elem.get("original_title")))
+  val orginalTittle = orginalT.groupBy(x => x).map(x => (x._1, x._2.length))
+  // printf("Titulo: \n %s \n ------", orginalTittle)
 
 }
+
 
 dependencia: libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.3"
 libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.10"
