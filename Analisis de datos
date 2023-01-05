@@ -15,8 +15,6 @@ object uuw extends App{
     .flatMap(elem => elem.get("index"))
   val id = data
     .flatMap(elem => elem.get("id"))
-  val popularity = data
-    .flatMap(elem => elem.get("popularity")).map(_.toInt)
 
   //COLUMNAS EXTRA
   val originalTittle = data
@@ -43,11 +41,5 @@ object uuw extends App{
   val idWithOriginalTittle = id.zip(originalTittle)
   println()
   println(idWithOriginalTittle)
-
-  val zippedList2 = originalTittle.zip(popularity);
-  val peliculaMasPopular = zippedList2.maxBy(_._2)
-  val peliculaMenPopular = zippedList2.minBy(_._2)
-  println("\nPelicula mas popular: " + peliculaMasPopular)
-  println("Pelicula menos popular: " + peliculaMenPopular)
   
 }
