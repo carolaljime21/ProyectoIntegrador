@@ -1,0 +1,53 @@
+import com.github.tototoshi.csv._
+import java.io.File
+
+object uuw extends App{
+  val reader = CSVReader.open(new File("C:/Users/SALA A/Desktop/movie_dataset.csv"))
+  val data = reader.allWithHeaders()
+  reader.close()
+
+  //COLUMNAS NUMÉRICAS
+  val budgetWithOut0 = data
+    .flatMap(elem => elem.get("budget")).map(_.toInt).filter(_ > 0)
+  val budgetWith0 = data
+    .flatMap(elem => elem.get("budget")).map(_.toInt)
+  val index = data
+    .flatMap(elem => elem.get("index"))
+  val id = data
+    .flatMap(elem => elem.get("id"))
+  val popularity = data
+    .flatMap(elem => elem.get("popularity")).map(_.toInt)
+
+  //COLUMNAS EXTRA
+  val originalTittle = data
+    .flatMap(elem => elem.get("original_title"))
+
+  //PROCESOS
+  val indexWithOriginalTittle = index.zip(originalTittle);
+  println(indexWithOriginalTittle)
+
+  val zippedList = originalTittle.zip(budgetWithOut0);
+  val peliculaMayPres = zippedList.maxBy(_._2)
+  val peliculaMenPres = zippedList.minBy(_._2)
+  println("\nPelicula con mayor presupuesto: " + peliculaMayPres)
+  println("Pelicula con menor presupuesto: " + peliculaMenPres)
+
+  val sumBudget2 = budgetWithOut0.sum
+  val promBudget2 = sumBudget2 / budgetWithOut0.length
+  printf("\nPromedio presupuesto sin ceros: %d \n", promBudget2)
+
+  val sumBudget1 = budgetWith0.sum
+  val promBudget1 = sumBudget1 / budgetWith0.length
+  printf("Promedio presupuesto con ceros: %d \n", promBudget1)
+
+  val idWithOriginalTittle = id.zip(originalTittle)
+  println()
+  println(idWithOriginalTittle)
+
+  val zippedList2 = originalTittle.zip(popularity);
+  val peliculaMasPopular = zippedList2.maxBy(_._2)
+  val peliculaMenPopular = zippedList2.minBy(_._2)
+  println("\nPelicula mas popular: " + peliculaMasPopular)
+  println("Pelicula menos popular: " + peliculaMenPopular)
+  
+}
