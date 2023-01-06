@@ -12,9 +12,9 @@ object uuw extends App{
   val budgetWith0 = data
     .flatMap(elem => elem.get("budget")).map(_.toInt)
   val index = data
-    .flatMap(elem => elem.get("index"))
+    .flatMap(elem => elem.get("index")).map(_.toInt)
   val id = data
-    .flatMap(elem => elem.get("id"))
+    .flatMap(elem => elem.get("id")).map(_.toInt)
 
   //COLUMNAS EXTRA
   val originalTittle = data
