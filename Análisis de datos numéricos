@@ -7,57 +7,87 @@ object main extends App {
   reader.close()
 
   //COLUMNAS NUMÉRICAS
-  val budgetWithOut0 = data
-    .flatMap(elem => elem.get("budget")).map(_.toInt).filter(_ > 0)
-  val budgetWith0 = data
+  val budget = data
     .flatMap(elem => elem.get("budget")).map(_.toInt)
   val popularity = data
     .flatMap(elem => elem.get("popularity")).map(_.toDouble)
-  val popularityWithOut0 = data
-    .flatMap(elem => elem.get("popularity")).map(_.toDouble).filter(_ > 0)
   val revenue = data
     .flatMap(elem => elem.get("revenue")).map(_.toDouble)
-  val revenueSin0 = data
-    .flatMap(elem => elem.get("revenue")).map(_.toDouble).filter(_ > 0)
-
+  val runtime = data
+    .flatMap(elem => elem.get("runtime")).filter(_.nonEmpty).map(_.toDouble)
+  val vote_average = data
+    .flatMap(elem => elem.get("vote_average")).filter(_.nonEmpty).map(_.toDouble)
+  val vote_count = data
+    .flatMap(elem => elem.get("vote_count")).filter(_.nonEmpty).map(_.toDouble)
   //COLUMNAS EXTRA
   val originalTittle = data
     .flatMap(elem => elem.get("original_title"))
 
   //PROCESOS
-  val OriginalTittleWithBudget = originalTittle.zip(budgetWithOut0);
+
+  //Análisis películas con mayor y menor presupuesto
+  val OriginalTittleWithBudget = originalTittle.zip(budget);
   val peliculaMayPres = OriginalTittleWithBudget.maxBy(_._2)
   val peliculaMenPres = OriginalTittleWithBudget.minBy(_._2)
+  val peliculaMenPresSin0 = OriginalTittleWithBudget.filter(_._2 > 0).minBy(_._2)
   println("\nPelicula con mayor presupuesto: " + peliculaMayPres)
   println("Pelicula con menor presupuesto: " + peliculaMenPres)
+  println("Pelicula con menor presupuesto sin 0: " + peliculaMenPresSin0)
 
-  val sumBudget1 = budgetWith0.sum
-  val promBudget1 = sumBudget1 / budgetWith0.length
+  //Análisis promedio depresupuestos entre las peliculas
+  val sumBudget1 = budget.sum
+  val promBudget1 = sumBudget1 / budget.length
   printf("\nPromedio presupuesto con ceros: %d", promBudget1)
 
-  val sumBudget2 = budgetWithOut0.sum
-  val promBudget2 = sumBudget2 / budgetWithOut0.length
-  printf("Promedio presupuesto sin ceros: %d \n", promBudget2)
+  val Budget2 = budget.filter(_ > 0)
+  val sumBudget2 = Budget2.sum
+  val promBudget2 = sumBudget2 / Budget2.length
+  printf("\nPromedio presupuesto sin ceros: %d \n", promBudget2)
 
+  //Análisis películas con mayor y menor popularidad
   val OriginalTittleWithPopularity = originalTittle.zip(popularity);
   val peliculaMasPopu = OriginalTittleWithPopularity.maxBy(_._2)
   val peliculaMenPopu = OriginalTittleWithPopularity.minBy(_._2)
-  println("\nPelicula con mayor presupuesto: " + peliculaMasPopu)
-  println("Pelicula con menor presupuesto: " + peliculaMenPopu)
+  val peliculaMenPopuSin0 = OriginalTittleWithPopularity.filter(_._2 > 0).minBy(_._2)
+  println("\nPelicula con mayor popularidad: " + peliculaMasPopu)
+  println("Pelicula con menor popularidad: " + peliculaMenPopu)
+  println("Pelicula con menor popularidad (sin 0): " + peliculaMenPopuSin0)
 
-  val OriginalTittleWithPopularity2 = originalTittle.zip(popularityWithOut0);
-  val peliculaMenPopuSin0 = OriginalTittleWithPopularity2.minBy(_._2)
-  println("Pelicula con menor presupuesto (sin 0): " + peliculaMenPopuSin0)
-
+  //Análisis películas con mayor y menor ingresos
   val OriginalTittleWithRevenue = originalTittle.zip(revenue);
   val peliculaMayIngresos = OriginalTittleWithRevenue.maxBy(_._2)
   val peliculaMenIngresos = OriginalTittleWithRevenue.minBy(_._2)
+  val peliculaMenIngresosSin0 = OriginalTittleWithRevenue.filter(_._2 > 0).minBy(_._2)
   println("\nPelicula con mayores ingresos: " + peliculaMayIngresos)
   println("Pelicula con menores ingresos: " + peliculaMenIngresos)
-
-  val OriginalTittleWithRevenue2 = originalTittle.zip(revenueSin0);
-  val peliculaMenIngresosSin0 = OriginalTittleWithRevenue2.minBy(_._2)
   println("Pelicula con menores ingresos (sin 0): " + peliculaMenIngresosSin0)
+
+  //Análisis películas con mayor y menor duracion
+  val movieRuntime = originalTittle.zip(runtime);
+  val peliMayTiempo = movieRuntime.maxBy(_._2)
+  val peliMenTiempo = movieRuntime.minBy(_._2)
+  val peliMenTiempoSin0 = movieRuntime.filter(_._2 > 0).minBy(_._2)
+  println("\nPelicula con mayor duración: " + peliMayTiempo)
+  println("Pelicula con menor duración: " + peliMenTiempo)
+  println("Pelicula con menor duración sin 0: " + peliMenTiempoSin0)
+
+  //Análisis películas con mayor y menor promedio de votos
+  val movieVoteAverage = originalTittle.zip(vote_average);
+  val peliMayVAv = movieVoteAverage.maxBy(_._2)
+  val peliMenVAv = movieVoteAverage.minBy(_._2)
+  val peliMenVAvSin0 = movieVoteAverage.filter(_._2 > 0).minBy(_._2)
+  println("\nPelicula con mayor promedio de votos: " + peliMayVAv)
+  println("Pelicula con menor promedio de votos: " + peliMenVAv)
+  println("Pelicula con menor promedio de votos sin 0: " + peliMenVAvSin0)
+
+  //Análisis películas con mayor y menor conteo de votos
+  val movieVoteCount = originalTittle.zip(vote_count);
+  val peliMayVCo = movieVoteCount.maxBy(_._2)
+  val peliMenVCo = movieVoteCount.minBy(_._2)
+  val peliMenVCoSin0 = movieVoteCount.filter(_._2 > 0).minBy(_._2)
+  println("\nPelicula con mayor conteo de votos: " + peliMayVCo)
+  println("Pelicula con menor conteo de votos: " + peliMenVCo)
+  println("Pelicula con menor conteo de votos sin 0: " + peliMenVCoSin0)
 }
 
 // libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.10"
