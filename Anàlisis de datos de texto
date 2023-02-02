@@ -1,94 +1,161 @@
-import java.io.File
 import com.github.tototoshi.csv._
+import java.io.File
+import com.cibo.evilplot.plot._
+import com.cibo.evilplot.plot.aesthetics.DefaultTheme.{DefaultElements, DefaultTheme}
 
-object texto extends App {
 
-  val reader = CSVReader.open(new File("C:\\Users\\Kevin\\IdeaProjects\\ProyectoIntegrador\\src\\movie_dataset.csv"))
-  val data = reader.allWithHeaders()
-  reader.close()
+object ColumnasDeTexto extends App{
 
-  //genres
-  val genres = data.flatMap(x => x.get("genres"))
-    .groupBy(identity).map {
-    case genre => (genre._1, genre._2.size)
-  }
-  printf("Los generos son: %s\n" +
-    "El genero menos utilizado es: %s \n" +
-    "El genero mas utilizado es: %s \n" +
-    "\n",
-    genres.map(_._1).toSet, genres.minBy(_._2), genres.maxBy(_._2))
+  val reader = CSVReader.open(new File("C:/Users/HP/Desktop/Proyecto/movie_dataset.csv"))
+    val data = reader.allWithHeaders()
+    reader.close()
+  implicit val theme = DefaultTheme.copy(
+    elements = DefaultElements.copy(categoricalXAxisLabelOrientation = 45))
 
-  //original_language
-  val original_language = data.flatMap(x => x.get("original_language"))
-    .groupBy(identity).map {
-    case language => (language._1, language._2.size)
-  }
+    //genres
+    val genres = data.flatMap(x => x.get("genres"))
+      .groupBy(identity).map {
+      case genre => (genre._1, genre._2.size)
+    }
+    printf("Los generos son: %s\n" +
+      "El genero menos utilizado es: %s \n" +
+      "El genero mas utilizado es: %s \n" +
+      "\n",
+      genres.map(_._1).toSet, genres.minBy(_._2), genres.maxBy(_._2))
 
-  printf("\nLos codigos de idioma son: %s\n" +
-    "El codigo menos utilizado es: %s \n" +
-    "El codigo mas utilizado es: %s \n" +
-    "\n",
-    original_language.map(_._1).toSet, original_language.minBy(_._2),original_language.maxBy(_._2))
+  val genresValues = genres.take(10).map(_._2).map(_.toDouble).toList
+  val genresData = genres.take(10).map(_._1).toList
+  BarChart(genresValues)
+    .title("INFORMACION GENEROS")
+    .xAxis(genresData)
+    .yAxis()
+    .frame()
+    .yLabel("data")
+    .bottomLegend()
+    .render()
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/genres.png"))
 
-  //original_title
-  val original_title = data.flatMap(x => x.get("original_title"))
-    .groupBy(identity ).map {
-    case o_title => (o_title._1, o_title._2.size)
-  }
+    //original_language
+    val original_language = data.flatMap(x => x.get("original_language"))
+      .groupBy(identity).map {
+      case language => (language._1, language._2.size)
+    }
 
-  printf("\nLos titulos son: %s\n" +
-    "El titulo menos utilizado es: %s \n" +
-    "El titulo mas utilizado es: %s \n" ,
-    original_title.map(_._1).toSet, original_title.minBy(_._2),
-  original_title.maxBy(_._2))
+    printf("\nLos codigos de idioma son: %s\n" +
+      "El codigo menos utilizado es: %s \n" +
+      "El codigo mas utilizado es: %s \n" +
+      "\n",
+      original_language.map(_._1).toSet, original_language.minBy(_._2), original_language.maxBy(_._2))
 
-  //release_date
-  val release_date = data.flatMap(x => x.get("release_date"))
-    .groupBy(identity).map {
-    case date => (date._1, date._2.size)
-  }
+  val languageValues = original_language.take(10).map(_._2).map(_.toDouble).toList
+  val languageData = original_language.take(10).map(_._1).toList
+  BarChart(languageValues)
+    .title("INFORMACION LENGUAJE ORIGINAL")
+    .xAxis(languageData)
+    .yAxis()
+    .frame()
+    .yLabel("data")
+    .bottomLegend()
+    .render()
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/lenguajeor.png"))
 
-  printf("\nLas fechas de salida son: %s\n" +
-    "La fecha menos lanzamientos fue: %s \n" +
-    "La fecha con mas lanzamientos fue: %s \n",
-    release_date.map(_._1).toSet, release_date.minBy(_._2),
-  release_date.maxBy(_._2))
+    //original_title
+    val original_title = data.flatMap(x => x.get("original_title"))
+      .groupBy(identity).map {
+      case o_title => (o_title._1, o_title._2.size)
+    }
 
-  //status
-  val status = data.flatMap(x => x.get("status"))
-    .groupBy(identity).map {
-    case status => (status._1, status._2.size)
-  }
+    printf("\nLos titulos son: %s\n" +
+      "El titulo menos utilizado es: %s \n" +
+      "El titulo mas utilizado es: %s \n",
+      original_title.map(_._1).toSet, original_title.minBy(_._2),
+      original_title.maxBy(_._2))
+  
 
-  printf("\nLos estados de las películas son: %s\n" +
-    "El estado menos utilizado fue: %s\n" +
-    "El estado mas utilizado fue: %s\n" +
-    "\n",
-    status.map(_._1).toSet, status.minBy(_._2),
-    status.maxBy(_._2))
+    //release_date
+    val release_date = data.flatMap(x => x.get("release_date"))
+      .groupBy(identity).map {
+      case date => (date._1, date._2.size)
+    }
 
-  //title
-  val title = data.flatMap(x => x.get("title"))
-    .groupBy(identity).map {
-    case title => (title._1, title._2.size)
-  }
+    printf("\nLas fechas de salida son: %s\n" +
+      "La fecha menos lanzamientos fue: %s \n" +
+      "La fecha con mas lanzamientos fue: %s \n",
+      release_date.map(_._1).toSet, release_date.minBy(_._2),
+      release_date.maxBy(_._2))
 
-  printf("\nLos titulos de las películas son: %s\n" +
-    "El titulo con menos apariciones fue: %s \n" +
-    "El titulo con mas apariciones fue: %s \n" ,
+  val dateValues = release_date.take(10).map(_._2).map(_.toDouble).toList
+  val dateData = release_date.take(10).map(_._1).toList
+  BarChart(dateValues)
+    .title("INFORMACION FECHA DE LANZAMIENTO")
+    .xAxis(dateData)
+    .yAxis()
+    .frame()
+    .yLabel("data")
+    .bottomLegend()
+    .render()
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/date.png"))
 
-    title.map(_._1).toSet, title.minBy(_._2),
-  title.maxBy(_._2))
+    //status
+    val status = data.flatMap(x => x.get("status"))
+      .groupBy(identity).map {
+      case status => (status._1, status._2.size)
+    }
 
-  //director
-  val director = data.flatMap(x => x.get("director"))
-    .groupBy(identity).map {
-    case director => (director._1, director._2.size)
-  }
+    printf("\nLos estados de las películas son: %s\n" +
+      "El estado menos utilizado fue: %s\n" +
+      "El estado mas utilizado fue: %s\n" +
+      "\n",
+      status.map(_._1).toSet, status.minBy(_._2),
+      status.maxBy(_._2))
 
-  printf("\nLos directores de las películas son: %s\n" +
-    "El director con menos apariciones fue: %s \n" +
-    "El director con mas apariciones fue: %s \n" ,
-    director.map(_._1).toSet, director.minBy(_._2),
-  director.maxBy(_._2))
+  val statusValues = status.take(10).map(_._2).map(_.toDouble).toList
+  val statusData = status.take(10).map(_._1).toList
+  BarChart(statusValues)
+    .title("INFORMACION ESTADO")
+    .xAxis(statusData)
+    .yAxis()
+    .frame()
+    .yLabel("data")
+    .bottomLegend()
+    .render()
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/status.png"))
+
+    //title
+    val title = data.flatMap(x => x.get("title"))
+      .groupBy(identity).map {
+      case title => (title._1, title._2.size)
+    }
+
+    printf("\nLos titulos de las películas son: %s\n" +
+      "El titulo con menos apariciones fue: %s \n" +
+      "El titulo con mas apariciones fue: %s \n",
+
+      title.map(_._1).toSet, title.minBy(_._2),
+      title.maxBy(_._2))
+
+    //director
+    val director = data.flatMap(x => x.get("director"))
+      .groupBy(identity).map {
+      case director => (director._1, director._2.size)
+    }.filterNot(_._1.isEmpty)
+
+    printf("\nLos directores de las películas son: %s\n" +
+      "El director con menos apariciones fue: %s \n" +
+      "El director con mas apariciones fue: %s \n",
+      director.map(_._1).toSet, director.minBy(_._2),
+      director.maxBy(_._2))
+
+  val directorValues = genres.take(10).map(_._2).map(_.toDouble).toList
+  val directorData = genres.take(10).map(_._1).toList
+  BarChart(directorValues)
+    .title("INFORMACION DIRECTORES")
+    .xAxis(directorData)
+    .yAxis()
+    .frame()
+    .yLabel("generos")
+    .bottomLegend()
+    .render()
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/director.png"))
+
 }
