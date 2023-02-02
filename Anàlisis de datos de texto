@@ -146,8 +146,8 @@ object ColumnasDeTexto extends App{
       director.map(_._1).toSet, director.minBy(_._2),
       director.maxBy(_._2))
 
-  val directorValues = genres.take(10).map(_._2).map(_.toDouble).toList
-  val directorData = genres.take(10).map(_._1).toList
+  val directorValues = director.take(10).map(_._2).map(_.toDouble).toList
+  val directorData = director.take(10).map(_._1).toList
   BarChart(directorValues)
     .title("INFORMACION DIRECTORES")
     .xAxis(directorData)
