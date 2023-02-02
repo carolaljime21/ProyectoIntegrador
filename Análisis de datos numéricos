@@ -1,12 +1,14 @@
 import com.github.tototoshi.csv._
 import java.io.File
 import com.cibo.evilplot.plot._
-import com.cibo.evilplot.plot.aesthetics.DefaultTheme._
+import com.cibo.evilplot.plot.aesthetics.DefaultTheme.{DefaultElements, DefaultTheme}
 
 object main extends App {
   val reader = CSVReader.open(new File("C:/Users/HP/Desktop/Proyecto/movie_dataset.csv"))
   val data = reader.allWithHeaders()
   reader.close()
+  implicit val theme = DefaultTheme.copy(
+    elements = DefaultElements.copy(categoricalXAxisLabelOrientation = 45))
 
   //COLUMNAS NUMÉRICAS
   val budget = data
