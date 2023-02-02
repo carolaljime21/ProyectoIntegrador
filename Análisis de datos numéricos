@@ -188,7 +188,7 @@ object main extends App {
   printf("\nPromedio de conteo de votos sin ceros: %f", promContVot2)
   val votosValues = movieVoteCount.take(10).map(_._2)
 
-  BarChart(votosPromValues)
+  BarChart(votosValues)
     .title("INFORMACION DE CONTEO DE VOTOS")
     .xAxis(titleData)
     .yAxis()
