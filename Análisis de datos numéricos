@@ -84,7 +84,7 @@ object main extends App {
     .yLabel("popularidad")
     .bottomLegend()
     .render()
-    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/presupuestos.png"))
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/popularidad.png"))
 
   //Análisis películas con mayor y menor ingresos
   val OriginalTittleWithRevenue = originalTittle.zip(revenue);
@@ -112,7 +112,7 @@ object main extends App {
     .yLabel("ingresos")
     .bottomLegend()
     .render()
-    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/presupuestos.png"))
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/ingresos.png"))
 
   //Análisis películas con mayor y menor duracion
   val movieRuntime = originalTittle.zip(runtime);
@@ -140,7 +140,7 @@ object main extends App {
     .yLabel("duración")
     .bottomLegend()
     .render()
-    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/presupuestos.png"))
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/duración.png"))
 
   //Análisis películas con mayor y menor promedio de votos
   val movieVoteAverage = originalTittle.zip(vote_average);
@@ -168,7 +168,7 @@ object main extends App {
     .yLabel("votos en promedio")
     .bottomLegend()
     .render()
-    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/presupuestos.png"))
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/votospromedio.png"))
 
   //Análisis películas con mayor y menor conteo de votos
   val movieVoteCount = originalTittle.zip(vote_count);
@@ -196,7 +196,7 @@ object main extends App {
     .yLabel("conteo de votos")
     .bottomLegend()
     .render()
-    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/presupuestos.png"))
+    .write(new File("C:/Users/HP/Desktop/Proyecto/Graficas/conteovotos.png"))
 }
 
 // libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.3.10"
