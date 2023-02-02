@@ -3,7 +3,7 @@ import java.io.File
 import com.cibo.evilplot.plot._
 import com.cibo.evilplot.plot.aesthetics.DefaultTheme.{DefaultElements, DefaultTheme}
 
-object main extends App {
+object ColumnasNuméricas extends App {
   val reader = CSVReader.open(new File("C:/Users/HP/Desktop/Proyecto/movie_dataset.csv"))
   val data = reader.allWithHeaders()
   reader.close()
