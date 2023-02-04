@@ -163,7 +163,7 @@ object ColumnasNuméricas extends App {
   val votosPromValues = movieVoteAverage.take(10).map(_._2)
 
   BarChart(votosPromValues)
-    .title("INFORMACION VOTOS EN PROMEDIO")
+    .title("INFORMACIÓN VOTOS EN PROMEDIO")
     .xAxis(titleData)
     .yAxis()
     .frame()
