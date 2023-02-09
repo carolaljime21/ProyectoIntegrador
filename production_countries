@@ -1,0 +1,62 @@
+import play.api.libs.json._
+import scala.util.{Failure, Success, Try}
+import com.github.tototoshi.csv._
+import java.io.File
+import requests.Response
+import scalikejdbc._
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths, StandardOpenOption}
+
+object Main extends App{
+
+  val reader = CSVReader.open(new File("C:/Users/HP/Desktop/Proyecto/movie_dataset.csv"))
+  val data = reader.allWithHeaders()
+  reader.close()
+
+  val productionCountries = data
+    .map(row => (row("id"), row("production_countries")))
+
+  val groupedPCT = productionCountries.groupBy(_._1)
+  val pcWithMovieId = groupedPCT.flatMap { case (movieId, pcList) =>
+    val productionCountries = pcList.map(_._2)
+      .map(text => Try(Json.parse(text)))
+      .filter(_.isSuccess)
+      .map(_.get)
+      .flatMap(_.as[JsArray].value)
+      .map(_.as[JsObject])
+      .map(jsObj => (jsObj("iso_3166_1").as[String], jsObj("name").as[String], movieId.toInt))
+    productionCountries
+  }.toList.distinct
+
+ case class producCount(id: String,
+                         name: String,
+                         movieId: Int)
+
+
+  val movieProductionCountries = pcWithMovieId
+    .map(row => producCount(
+      row._1, row._2, row._3))
+
+  val SQL_INSERT_PATTERN =
+    """INSERT INTO HOMEPAGES (`ID`, `NAME`, `MOVIE_ID`)
+      |VALUES
+      |('%s', '%s', '%d');
+      |""".stripMargin
+
+  val scriptData = movieProductionCountries
+    .map(movie => SQL_INSERT_PATTERN.formatLocal(java.util.Locale.US,
+      movie.id,
+      movie.name,
+      movie.movieId
+    ))
+
+  val scriptFile = new File("C:/Users/HP/Desktop/scripts/pCountries")
+  if (scriptFile.exists()) scriptFile.delete()
+
+  scriptData.foreach(insert =>
+    Files.write(Paths.get("C:/Users/HP/Desktop/scripts/pCountries"),
+      insert.getBytes(StandardCharsets.UTF_8),
+      StandardOpenOption.CREATE,
+      StandardOpenOption.APPEND))
+
+}
