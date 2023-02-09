@@ -1,75 +1,72 @@
 import java.io.File
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import com.cibo.evilplot.plot._
-import com.cibo.evilplot.plot.aesthetics.DefaultTheme._
 import play.api.libs.json._
 import com.github.tototoshi.csv._
 import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
-import requests.Response
-import scalikejdbc._
 
+import scalikejdbc._
 object Crew extends App {
-//LIMPIAR COLUMNA CREW
   val reader = CSVReader.open(new File("src/movie_dataset.csv"))
   val data = reader.allWithHeaders()
   reader.close()
-  def replacePattern(original : String) : String = {
+  def replacePattern(original: String): String = {
     var txtOr = original
     val pattern: Regex = "(\\s\"(.*?)\",)".r
-    for(m <- pattern.findAllIn(original)) {
+    for (m <- pattern.findAllIn(original)) {
       val textOriginal = m
       val replacementText = m.replace("'", "-u0027")
       txtOr = txtOr.replace(textOriginal, replacementText)
     }
     txtOr
   }
-  def replacePattern2(original : String) : String = {
+  def replacePattern2(original: String): String = {
     var txtOr = original
     val pattern: Regex = "([a-z]\\s\"(.*?)\"\\s*[A-Z])".r
-    for(m <- pattern.findAllIn(original)) {
+    for (m <- pattern.findAllIn(original)) {
       val textOriginal = m
       val replacementText = m.replace("\"", "-u0022")
       txtOr = txtOr.replace(textOriginal, replacementText)
     }
     txtOr
   }
-  def replacePattern3(original : String) : String = {
+  def replacePattern3(original: String): String = {
     var txtOr = original
     val pattern: Regex = "(:\\s'\"(.*?)',)".r
-    for(m <- pattern.findAllIn(original)) {
+    for (m <- pattern.findAllIn(original)) {
       val textOriginal = m
       val replacementText = m.replace("\"", "-u0022")
       txtOr = txtOr.replace(textOriginal, replacementText)
     }
     txtOr
   }
-  val crew = data
-    .map(row => row("crew"))
-    .map(replacePattern2)
-    .map(replacePattern)
-    .map(replacePattern3)
-    .map(text => text.replace("'", "\""))
-    .map(text => text.replace("-u0027", "'"))
-    .map(text => text.replace("-u0022", "\\\""))
-    .map(text => Try(Json.parse(text)))
-    .filter(_.isSuccess)
+  val list = data
+    .map(row => (row("id"), row("crew")))
+  val groupedCrew = list.groupBy(_._1)
+  val crewWithMovieId = groupedCrew.flatMap { case (movieId, crewList) =>
+    val crew = crewList.map(_._2)
+      .map(replacePattern2)
+      .map(replacePattern)
+      .map(replacePattern3)
+      .map(text => text.replace("'", "\""))
+      .map(text => text.replace("-u0027", "'"))
+      .map(text => text.replace("-u0022", "\\\""))
+      .map(text => Try(Json.parse(text)))
+      .filter(_.isSuccess)
+      .map(_.get)
+      .flatMap(_.as[JsArray].value)
+      .map(_.as[JsObject])
+      .map(jsObj => (movieId.toInt, jsObj("id").as[Int], jsObj("name").as[String], jsObj("gender").toString()
+        , jsObj("department").as[String], jsObj("job").as[String], jsObj("credit_id").as[String]))
+    crew
+  }.toList.distinct
+    Class.forName("com.mysql.cj.jdbc.Driver")
+    ConnectionPool.singleton("jdbc:mysql://localhost:3306/proyecto", "root", "1234")
+    implicit val session = AutoSession
 
-val idNameList = crew
-    .filter(_.isSuccess)
-    .map(_.get)
-    .flatMap(_.as[JsArray].value)
-    .map(_.as[JsObject])
-    .map(jsObj => (jsObj("id").as[Int],jsObj("name").as[String]))
-    .groupBy(identity)
-    .map {
-      case (tupla, list) => (tupla, list.size)
-    }
-    .filter(_._2 > 1)
-    .toList
-    .sortBy(_._2)
-    .reverse
-  println(crew.size)
-  println(idNameList.take(10))
+  crewWithMovieId.map(x =>
+    sql"""
+         |INSERT INTO crews(movie_id, id, name, gender, department, job, credit_id)
+          VALUES (${x._1}, ${x._2}, ${x._3}, ${x._4}, ${x._5}, ${x._6}, ${x._7})
+         |""".stripMargin.update.apply()
+  )
 }
