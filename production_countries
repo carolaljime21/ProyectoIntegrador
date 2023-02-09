@@ -38,7 +38,7 @@ object Main extends App{
       row._1, row._2, row._3))
 
   val SQL_INSERT_PATTERN =
-    """INSERT INTO HOMEPAGES (`ID`, `NAME`, `MOVIE_ID`)
+    """INSERT INTO PRODUCTION_COUNTRIES (`ID`, `NAME`, `MOVIE_ID`)
       |VALUES
       |('%s', '%s', '%d');
       |""".stripMargin
