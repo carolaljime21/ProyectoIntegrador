@@ -4,7 +4,7 @@ import com.github.tototoshi.csv._
 import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
 import scalikejdbc._
-
+import GenerarSQL.escapeMysql
 object Directors extends App {
   val reader = CSVReader.open(new File("src/movie_dataset.csv"))
   val data = reader.allWithHeaders()
@@ -55,8 +55,13 @@ object Directors extends App {
       .map(_.get)
       .flatMap(_.as[JsArray].value)
       .map(_.as[JsObject])
-      .map(jsObj => (movieId.toInt, jsObj("id").as[Int], jsObj("name").as[String], jsObj("gender").toString()
-        , jsObj("department").as[String], jsObj("job").as[String], jsObj("credit_id").as[String]))
+      .map( jsObj => (movieId.toInt,
+            jsObj("id").as[Int],
+            escapeMysql(jsObj("name").as[String]),
+            escapeMysql(jsObj("gender").toString()),
+            escapeMysql(jsObj("department").as[String]),
+            escapeMysql(jsObj("job").as[String]),
+            escapeMysql(jsObj("credit_id").as[String])))
     crew
   }.toList.distinct.filter(_._6 == ("Director"))
 
@@ -70,5 +75,4 @@ object Directors extends App {
           VALUES (${x._1}, ${x._2}, ${x._3}, ${x._4}, ${x._5}, ${x._6}, ${x._7})
          |""".stripMargin.update.apply()
   )
-  println(crewWithMovieId.take(10))
 }
