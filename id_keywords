@@ -13,7 +13,7 @@ object Main extends App{
   val data = reader.allWithHeaders()
   reader.close()
 
-  case class keywords(id: Long,
+  case class keywords(id: Int,
                       keywords: String)
 
   val SQL_INSERT_PATTERN =
@@ -24,7 +24,7 @@ object Main extends App{
 
   val movieKeywords = data
     .map(row => keywords(
-      row("id").toLong,
+      row("id").toInt,
       row("keywords")))
 
   val scriptData = movieKeywords
