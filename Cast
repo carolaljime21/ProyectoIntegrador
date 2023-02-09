@@ -4,6 +4,7 @@ import com.github.tototoshi.csv._
 import java.io.File
 import requests.Response
 import scalikejdbc._
+import GenerarSQL.escapeMysql
 
 object Cast extends App {
   val reader = CSVReader.open(new File("src/movie_dataset.csv"))
@@ -29,6 +30,7 @@ object Cast extends App {
     jsValue("entity_list").as[JsArray].value
     .map (_("form"))
     .map (_.as[String])
+      .map(x => escapeMysql(x))
     .toList
 
 
