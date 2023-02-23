@@ -34,30 +34,29 @@ object Cast extends App {
     .toList
 
 
-  val castId = data
-    .map(row => (row("id"), row("cast")))
-    .filter(_._2.nonEmpty)
-    .map(tuple2 => (tuple2._1, StringContext.processEscapes(tuple2._2)))
-    .map{ t2 => (t2._1, actorsNames(t2._2))}
-    .map{ t2 => (t2._1,Try(Json.parse(t2._2.get)))}
-    .filter(_._2.isSuccess)
-    .map(t2 => (t2._1, t2._2.get))
-    .map(t2 => (t2._1, transform(t2._2)))
-    .flatMap(t2 =>t2._2.map(name => (t2._1, name)))
-    .distinct
+    val list = data
+    .map(row => (row("original_language"), row("production_companies")))
+  val groupedCrew = list.groupBy(_._1)
+  val crewWithMovieId = groupedCrew.flatMap { case (lan, crewList) =>
+    val crew = crewList.map(_._2)
+      .map(replacePattern2)
+      .map(replacePattern)
+      .map(replacePattern3)
+      .map(text => text.replace("'", "\""))
+      .map(text => text.replace("-u0027", "'"))
+      .map(text => text.replace("-u0022", "\\\""))
+      .map(text => Try(Json.parse(text)))
+      .filter(_.isSuccess)
+      .map(_.get)
+      .flatMap(_.as[JsArray].value)
+      .map(_.as[JsObject])
+      .map(jsObj => (lan, jsObj("id").as[Int],
+        escapeMysql(jsObj("name").as[String])))
+    crew
+  }.toList.distinct
 
-    val f = new File( "C:/Users/Kevin/Desktop/Graficos/movie-cast.csv")
-    val writer = CSVWriter.open(f)
-    writer.writeAll(castId.map(_.productIterator.toList))
-    writer.close()
-
-    Class.forName("com.mysql.cj.jdbc.Driver")
-    ConnectionPool.singleton("jdbc:mysql://localhost:3306/proyecto", "root", "1234")
-    implicit val session = AutoSession
-
-    castId.map(x =>
-    sql"""
-    |INSERT INTO casts(MOVIE_ID, NAME) VALUES (${x._1}, ${x._2})
-    |""".stripMargin.update.apply()
-    )
+  val f = new File("src/movie-companies.csv")
+  val writer = CSVWriter.open(f)
+  writer.writeAll(crewWithMovieId.map(c => List(c._1, c._2, c._3)).toList)
+  writer.close()
 }
